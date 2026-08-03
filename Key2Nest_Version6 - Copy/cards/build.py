@@ -158,17 +158,45 @@ def esc(s):
     return html.escape(s, quote=True)
 
 
+ICONS = {
+    "call": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+    "text": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
+    "email": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+    "whatsapp": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
+}
+CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>'
+
+
+def build_contact_rows(p):
+    """Refined grouped contact panel — one elegant row per channel."""
+    rows = [
+        ("call", "Call", p["phone_display"], f"tel:{p['phone']}", ""),
+        ("text", "Text", "Send a message", f"sms:{p['phone']}", ""),
+        ("email", "Email", p["email"], f"mailto:{p['email']}", ""),
+    ]
+    if p.get("whatsapp"):
+        rows.append(("whatsapp", "WhatsApp", "Chat on WhatsApp",
+                     f"https://wa.me/{p['whatsapp']}", ' target="_blank" rel="noopener"'))
+    html_rows = []
+    for key, label, value, href, attrs in rows:
+        html_rows.append(f'''      <a class="row" href="{href}"{attrs} aria-label="{label} {esc(p['name'])}">
+        <span class="row-ic" aria-hidden="true">{ICONS[key]}</span>
+        <span class="row-main">
+          <span class="row-label">{label}</span>
+          <span class="row-value">{esc(value)}</span>
+        </span>
+        <span class="row-chev" aria-hidden="true">{CHEV}</span>
+      </a>''')
+    return "\n".join(html_rows)
+
+
 def build_page(p, card_url):
-    wa = p.get("whatsapp")
-    whatsapp_action = ""
-    if wa:
-        whatsapp_action = f'''
-          <a class="action" href="https://wa.me/{wa}" target="_blank" rel="noopener" aria-label="WhatsApp {esc(p['name'])}">
-            <span class="action-ic" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-            </span>
-            <span class="action-tx">WhatsApp</span>
-          </a>'''
+    # "Co-Founder / Sr. Mortgage Loan Originator" → eyebrow + role, presented cleanly.
+    if " / " in p["title"]:
+        eyebrow, role = [s.strip() for s in p["title"].split(" / ", 1)]
+    else:
+        eyebrow, role = "", p["title"]
+    contact_rows = build_contact_rows(p)
 
     meta_desc = f"{esc(p['name'])} — {esc(p['title'])} at {esc(COMPANY['name'])}. NMLS #{p['nmls']}. Save contact, call, text, or email directly."
 
@@ -246,14 +274,17 @@ def build_page(p, card_url):
       <img src="../assets/logo-gold.png" alt="Key2Nest Home Loans" class="brand-logo" width="132" height="40" />
     </a>
 
-    <header class="hero">
-      <div class="portrait-wrap">
+    <header class="identity">
+      <div class="portrait-ring">
         <img class="portrait" src="../assets/{esc(p['photo'])}" alt="Portrait of {esc(p['name'])}" width="360" height="360" loading="eager" decoding="async" />
       </div>
+      {f'<p class="eyebrow">{esc(eyebrow)}</p>' if eyebrow else ''}
       <h1 class="name">{esc(p['name'])}</h1>
-      <p class="title">{esc(p['title'])}</p>
+      <p class="role">{esc(role)}</p>
       <p class="nmls"><a href="https://www.nmlsconsumeraccess.org/EntityDetails.aspx/INDIVIDUAL/{p['nmls']}" target="_blank" rel="noopener">NMLS&nbsp;#{p['nmls']}</a></p>
     </header>
+
+    <div class="rule" aria-hidden="true"></div>
 
     <a class="save" href="../vcards/{esc(p['slug'])}.vcf" download="{esc(p['first'])}-{esc(p['last'])}.vcf">
       <span class="save-ic" aria-hidden="true">
@@ -262,25 +293,8 @@ def build_page(p, card_url):
       <span class="save-tx">Save to Contacts</span>
     </a>
 
-    <nav class="actions" aria-label="Contact {esc(p['name'])}">
-      <a class="action" href="tel:{p['phone']}" aria-label="Call {esc(p['name'])}">
-        <span class="action-ic" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        </span>
-        <span class="action-tx">Call</span>
-      </a>
-      <a class="action" href="sms:{p['phone']}" aria-label="Text {esc(p['name'])}">
-        <span class="action-ic" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        </span>
-        <span class="action-tx">Text</span>
-      </a>
-      <a class="action" href="mailto:{p['email']}" aria-label="Email {esc(p['name'])}">
-        <span class="action-ic" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-        </span>
-        <span class="action-tx">Email</span>
-      </a>{whatsapp_action}
+    <nav class="contacts" aria-label="Contact {esc(p['name'])}">
+{contact_rows}
     </nav>
 
     <a class="apply" href="{esc(COMPANY['apply_url'])}" target="_blank" rel="noopener">
@@ -289,8 +303,6 @@ def build_page(p, card_url):
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </span>
     </a>
-
-    <p class="bio">{esc(p['bio'])}</p>
 
     <footer class="foot">
       <p class="foot-org">{esc(COMPANY['name'])}</p>
