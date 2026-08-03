@@ -344,6 +344,8 @@ def main():
 
     # Directory landing page listing all cards (useful for QA / sharing).
     write_index(index_rows)
+    # Printable QR handoff sheet (all cards, name + URL + QR) for the card printer.
+    write_qr_sheet(index_rows)
     print(f"\nDone — {len(PEOPLE)} cards generated against base URL: {BASE_URL}")
 
 
@@ -385,6 +387,72 @@ def write_index(rows):
 </html>
 '''
     (ROOT / "index.html").write_text(doc, encoding="utf-8")
+
+
+def write_qr_sheet(rows):
+    """A single printable page with every card's QR, name, and URL — the
+    artifact you hand to whoever prints the physical business cards."""
+    cards = []
+    for p, card_url in rows:
+        svg = (ROOT / "qr" / f"{p['slug']}.svg").read_text(encoding="utf-8")
+        # strip the XML prolog so the SVG can be inlined cleanly
+        svg = svg[svg.find("<svg"):]
+        cards.append(f'''    <figure class="qr-card">
+      <div class="qr-img">{svg}</div>
+      <figcaption>
+        <span class="qr-name">{esc(p['name'])}</span>
+        <span class="qr-title">{esc(p['title'])}</span>
+        <span class="qr-url">{esc(card_url)}</span>
+      </figcaption>
+    </figure>''')
+    grid = "\n".join(cards)
+    doc = f'''<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Key2Nest — QR Codes for Business Cards</title>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400..700&family=Source+Serif+4:opsz,wght@8..60,400..600&display=swap" rel="stylesheet" />
+  <style>
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; padding: 40px 32px 56px; background: #FFFFFF; color: #0B1A2E;
+      font-family: "Source Sans 3", system-ui, sans-serif; }}
+    .sheet-head {{ text-align: center; margin: 0 auto 34px; max-width: 900px; }}
+    .sheet-head img {{ height: 78px; width: auto; }}
+    .sheet-head h1 {{ font-family: "Source Serif 4", Georgia, serif; font-weight: 500;
+      font-size: 26px; letter-spacing: -0.02em; margin: 14px 0 4px; }}
+    .sheet-head p {{ margin: 0; color: #5b6675; font-size: 13.5px; }}
+    .grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px;
+      max-width: 900px; margin: 0 auto; }}
+    .qr-card {{ margin: 0; border: 1px solid rgba(139,96,10,0.28); border-radius: 16px;
+      padding: 20px 16px; text-align: center; display: flex; flex-direction: column;
+      align-items: center; gap: 12px; break-inside: avoid; }}
+    .qr-img {{ width: 150px; height: 150px; }}
+    .qr-img svg {{ width: 100%; height: 100%; display: block; }}
+    figcaption {{ display: flex; flex-direction: column; gap: 3px; }}
+    .qr-name {{ font-family: "Source Serif 4", Georgia, serif; font-weight: 600; font-size: 16px; }}
+    .qr-title {{ font-size: 11px; color: #6b7280; letter-spacing: 0.02em; }}
+    .qr-url {{ font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+      color: #8B600A; margin-top: 4px; word-break: break-all; }}
+    @media (max-width: 720px) {{ .grid {{ grid-template-columns: repeat(2, 1fr); }} }}
+    @media (max-width: 460px) {{ .grid {{ grid-template-columns: 1fr; }} }}
+    @media print {{ body {{ padding: 16px; }} .grid {{ gap: 14px; }} a {{ color: inherit; }} }}
+  </style>
+</head>
+<body>
+  <header class="sheet-head">
+    <img src="./assets/Logo_LV-1x.png" srcset="./assets/Logo_LV-1x.png 1x, ./assets/Logo_LV-2x.png 2x" alt="Key2Nest Home Loans" />
+    <h1>Digital Business Card — QR Codes</h1>
+    <p>Scan to open each team member's card. Print-ready vectors: <code>qr/&lt;name&gt;.svg</code></p>
+  </header>
+  <div class="grid">
+{grid}
+  </div>
+</body>
+</html>
+'''
+    (ROOT / "qr-sheet.html").write_text(doc, encoding="utf-8")
 
 
 if __name__ == "__main__":
