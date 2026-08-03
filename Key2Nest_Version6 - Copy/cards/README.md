@@ -32,7 +32,8 @@ re-run the build before printing any QR codes** (see below).
 - **Save to Contacts** — downloads a vCard 3.0 (`.vcf`) with the person's name,
   title, phone, email, company, NMLS, and an **embedded portrait**, so the saved
   phone contact shows their photo.
-- **Call / Text / Email / WhatsApp** — one-tap native actions.
+- **Call / Text / Email / WhatsApp / Website** — one-tap actions; Website
+  opens the Key2Nest homepage (`https://key2nesthomeloans.com`).
 - **Apply Now** — CTA to the main site's inquiry form
   (`https://key2nesthomeloans.com/#contact`).
 - Automatic light/dark theme via `prefers-color-scheme` (no manual toggle);
@@ -76,9 +77,11 @@ fallback). The QR payload is `BASE_URL + "/" + slug`.
 
 ## Notes / open items for v2
 
-- **WhatsApp** is currently enabled on every card using each person's cell
-  number. Only Sreelakshmi had a confirmed WhatsApp number on the main site —
-  confirm which of the others are actually reachable on WhatsApp, or remove
-  `"whatsapp"` from their entry in `build.py`.
+- **WhatsApp** is enabled on every card using each person's own phone number
+  (client-confirmed). To change or remove it for anyone, edit their
+  `"whatsapp"` value in `build.py` and rerun.
+- **Base URL** is set to `https://key2nesthomeloans.com` — the cards are meant
+  to live at `/<slug>` on the main domain (host there or add redirects before
+  the QR codes resolve).
 - Future scope (per discussion): LinkedIn, calendar/booking links, per-person
-  taglines, and folding these into the main domain under `/team/<slug>`.
+  taglines, and folding these fully into the main domain under `/team/<slug>`.
