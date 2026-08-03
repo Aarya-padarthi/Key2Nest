@@ -65,15 +65,32 @@ python3 build.py                                  # uses BASE_URL in build.py
 python3 build.py --base-url https://your-host.com # override the QR/canonical host
 ```
 
-## Deploying
+## Deploying (integrated under key2nesthomeloans.com)
 
-It's a plain static site — deploy the `cards/` folder to any static host
-(Netlify, Cloudflare Pages, S3, etc.). Directory-based routing gives clean
-`/<slug>` URLs with **no redirect rules required**.
+The cards ship as part of the main site deploy and live at
+`key2nesthomeloans.com/cards/...`. A Netlify rewrite maps the clean per-person
+URL onto that folder, so the QR target `/vivek` serves `/cards/vivek/` while the
+address bar keeps `/vivek`:
 
-**Before printing QR codes:** point `BASE_URL` at the actual host, run
-`python3 build.py`, and use the files in `qr/` (SVG for print, PNG as a
-fallback). The QR payload is `BASE_URL + "/" + slug`.
+- **`../_redirects`** (in the site root, next to `index.html`) holds the rewrite
+  rules — one `200` line per slug. Keep it in sync with `PEOPLE` if slugs change.
+- The per-card pages reference assets **absolutely** under `ASSET_BASE`
+  (`/cards` — set in `build.py`) so they resolve regardless of the served URL.
+
+To publish: deploy the **site folder** (the one containing `index.html` and the
+`cards/` subfolder) to the Netlify site that serves `key2nesthomeloans.com`
+— Netlify manual deploy: *Deploys → drag the folder* (or *Manage deployments →
+New version*). After it goes live, scan-test one card before printing.
+
+Direct URLs that work even without the rewrite: `key2nesthomeloans.com/cards/<slug>/`.
+
+> Hosting the `cards/` folder as its own standalone site instead? Set
+> `ASSET_BASE = ""` in `build.py`, rerun, and skip `_redirects` — directory
+> routing then gives clean `/<slug>` URLs with no rewrite needed.
+
+**Before printing QR codes:** confirm the deployed URL resolves, then use the
+files in `qr/` (SVG for print, PNG as a fallback). The QR payload is
+`BASE_URL + "/" + slug`.
 
 ## Notes / open items for v2
 

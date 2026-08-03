@@ -38,10 +38,16 @@ ROOT = Path(__file__).resolve().parent
 # --------------------------------------------------------------------------
 # Configuration
 # --------------------------------------------------------------------------
-# The host the printed QR codes should point to. These cards are, for now,
-# deployed INDEPENDENTLY of the main marketing site. The slugs are chosen so
-# they migrate cleanly to the main domain later (e.g. /vivek -> /team/vivek).
+# The host the printed QR codes point to.
 BASE_URL = "https://key2nesthomeloans.com"
+
+# Absolute path where the cards folder is served on that host. The pages are
+# deployed under key2nesthomeloans.com/cards/ and a Netlify rewrite maps the
+# clean /<slug> URL onto /cards/<slug>/ (see _redirects in the site root). The
+# per-card pages therefore reference assets absolutely (e.g. /cards/card.css)
+# so they resolve no matter which URL served the page. Change this in one place
+# if the cards ever move (e.g. "" if the cards folder becomes the site root).
+ASSET_BASE = "/cards"
 
 COMPANY = {
     "name": "Key2Nest Home Loans LLC",
@@ -215,10 +221,10 @@ def build_page(p, card_url):
   <meta name="format-detection" content="telephone=no" />
   <title>{esc(p['name'])} — {esc(COMPANY['name'])}</title>
 
-  <link rel="icon" href="../assets/favicon.ico" sizes="any" />
-  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
-  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png" />
+  <link rel="icon" href="{ASSET_BASE}/assets/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="{ASSET_BASE}/assets/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{ASSET_BASE}/assets/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{ASSET_BASE}/assets/apple-touch-icon.png" />
   <link rel="canonical" href="{esc(card_url)}" />
 
   <meta property="og:type" content="profile" />
@@ -231,7 +237,7 @@ def build_page(p, card_url):
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300..700;1,300..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../card.css" />
+  <link rel="stylesheet" href="{ASSET_BASE}/card.css" />
 
   <script type="application/ld+json">
   {{
@@ -260,14 +266,14 @@ def build_page(p, card_url):
 
     <a class="brand" href="{esc(COMPANY['site_url'])}" aria-label="Key2Nest Home Loans home">
       <picture>
-        <source srcset="../assets/Logo_LV-1x.png 1x, ../assets/Logo_LV-2x.png 2x" media="(prefers-color-scheme: light)" />
-        <img src="../assets/Logo_DV-1x.png" srcset="../assets/Logo_DV-1x.png 1x, ../assets/Logo_DV-2x.png 2x" alt="Key2Nest Home Loans" class="brand-logo" width="200" height="200" loading="eager" decoding="async" />
+        <source srcset="{ASSET_BASE}/assets/Logo_LV-1x.png 1x, {ASSET_BASE}/assets/Logo_LV-2x.png 2x" media="(prefers-color-scheme: light)" />
+        <img src="{ASSET_BASE}/assets/Logo_DV-1x.png" srcset="{ASSET_BASE}/assets/Logo_DV-1x.png 1x, {ASSET_BASE}/assets/Logo_DV-2x.png 2x" alt="Key2Nest Home Loans" class="brand-logo" width="200" height="200" loading="eager" decoding="async" />
       </picture>
     </a>
 
     <header class="identity">
       <div class="portrait-ring">
-        <img class="portrait" src="../assets/{esc(p['photo'])}" alt="Portrait of {esc(p['name'])}" width="360" height="360" loading="eager" decoding="async" />
+        <img class="portrait" src="{ASSET_BASE}/assets/{esc(p['photo'])}" alt="Portrait of {esc(p['name'])}" width="360" height="360" loading="eager" decoding="async" />
       </div>
       {f'<p class="eyebrow">{esc(eyebrow)}</p>' if eyebrow else ''}
       <h1 class="name">{esc(p['name'])}</h1>
@@ -277,7 +283,7 @@ def build_page(p, card_url):
 
     <div class="rule" aria-hidden="true"></div>
 
-    <a class="save" href="../vcards/{esc(p['slug'])}.vcf" download="{esc(p['first'])}-{esc(p['last'])}.vcf">
+    <a class="save" href="{ASSET_BASE}/vcards/{esc(p['slug'])}.vcf" download="{esc(p['first'])}-{esc(p['last'])}.vcf">
       <span class="save-ic" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
       </span>
