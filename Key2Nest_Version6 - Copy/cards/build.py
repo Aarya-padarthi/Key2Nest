@@ -201,7 +201,7 @@ def build_page(p, card_url):
     meta_desc = f"{esc(p['name'])} — {esc(p['title'])} at {esc(COMPANY['name'])}. NMLS #{p['nmls']}. Save contact, call, text, or email directly."
 
     return f'''<!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -229,17 +229,6 @@ def build_page(p, card_url):
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300..700;1,300..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../card.css" />
 
-  <script>
-    // No-flash theme: follow the OS, honor a saved manual override.
-    (function () {{
-      try {{
-        var t = localStorage.getItem('k2n-theme');
-        document.documentElement.dataset.theme =
-          t || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-      }} catch (e) {{ document.documentElement.dataset.theme = 'dark'; }}
-    }})();
-  </script>
-
   <script type="application/ld+json">
   {{
     "@context": "https://schema.org",
@@ -263,15 +252,13 @@ def build_page(p, card_url):
 <body>
   <div class="bg-orbs" aria-hidden="true"><span class="orb orb-a"></span><span class="orb orb-b"></span></div>
 
-  <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme" data-theme-toggle>
-    <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-    <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-  </button>
-
   <main class="card" role="main">
 
     <a class="brand" href="{esc(COMPANY['site_url'])}" aria-label="Key2Nest Home Loans home">
-      <img src="../assets/logo-gold.png" alt="Key2Nest Home Loans" class="brand-logo" width="132" height="40" />
+      <picture>
+        <source srcset="../assets/Logo_LV-1x.png 1x, ../assets/Logo_LV-2x.png 2x" media="(prefers-color-scheme: light)" />
+        <img src="../assets/Logo_DV-1x.png" srcset="../assets/Logo_DV-1x.png 1x, ../assets/Logo_DV-2x.png 2x" alt="Key2Nest Home Loans" class="brand-logo" width="200" height="200" loading="eager" decoding="async" />
+      </picture>
     </a>
 
     <header class="identity">
@@ -310,19 +297,6 @@ def build_page(p, card_url):
       <p class="foot-nmls"><a href="{esc(COMPANY['nmls_url'])}" target="_blank" rel="noopener">Company NMLS&nbsp;#{COMPANY['nmls']}</a> · Equal Housing Lender</p>
     </footer>
   </main>
-
-  <script>
-    // Manual theme override (persists, then wins over the OS).
-    (function () {{
-      var btn = document.querySelector('[data-theme-toggle]');
-      if (!btn) return;
-      btn.addEventListener('click', function () {{
-        var next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-        document.documentElement.dataset.theme = next;
-        try {{ localStorage.setItem('k2n-theme', next); }} catch (e) {{}}
-      }});
-    }})();
-  </script>
 </body>
 </html>
 '''
@@ -378,10 +352,12 @@ def write_index(rows):
         for p, _ in rows
     )
     doc = f'''<!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B1A2E" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F4EFE3" media="(prefers-color-scheme: light)" />
   <meta name="robots" content="noindex" />
   <title>Key2Nest — Team Cards</title>
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300..700&family=Source+Serif+4:opsz,wght@8..60,300..700&display=swap" rel="stylesheet" />
@@ -389,7 +365,12 @@ def write_index(rows):
 </head>
 <body class="index-body">
   <main class="index-wrap">
-    <img src="./assets/logo-gold.png" alt="Key2Nest Home Loans" width="150" height="46" class="index-logo" />
+    <a class="brand" href="{esc(COMPANY['site_url'])}" aria-label="Key2Nest Home Loans home">
+      <picture>
+        <source srcset="./assets/Logo_LV-1x.png 1x, ./assets/Logo_LV-2x.png 2x" media="(prefers-color-scheme: light)" />
+        <img src="./assets/Logo_DV-1x.png" srcset="./assets/Logo_DV-1x.png 1x, ./assets/Logo_DV-2x.png 2x" alt="Key2Nest Home Loans" class="index-logo" width="200" height="200" />
+      </picture>
+    </a>
     <h1>Digital Business Cards</h1>
     <p class="index-sub">Tap a name to preview that member's card.</p>
     <ul class="index-list">

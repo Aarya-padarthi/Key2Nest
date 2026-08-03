@@ -35,7 +35,8 @@ re-run the build before printing any QR codes** (see below).
 - **Call / Text / Email / WhatsApp** — one-tap native actions.
 - **Apply Now** — CTA to the main site's inquiry form
   (`https://key2nesthomeloans.com/#contact`).
-- Light/dark theme toggle (follows the OS by default), NMLS badges, company
+- Automatic light/dark theme via `prefers-color-scheme` (no manual toggle);
+  the logo swaps between the gold (dark) and navy (light) lockups. NMLS badges, company
   licensing footer, Person + Organization schema.org markup.
 
 ## Structure

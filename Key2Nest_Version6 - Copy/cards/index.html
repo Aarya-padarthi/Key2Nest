@@ -1,8 +1,10 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B1A2E" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F4EFE3" media="(prefers-color-scheme: light)" />
   <meta name="robots" content="noindex" />
   <title>Key2Nest — Team Cards</title>
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300..700&family=Source+Serif+4:opsz,wght@8..60,300..700&display=swap" rel="stylesheet" />
@@ -10,7 +12,12 @@
 </head>
 <body class="index-body">
   <main class="index-wrap">
-    <img src="./assets/logo-gold.png" alt="Key2Nest Home Loans" width="150" height="46" class="index-logo" />
+    <a class="brand" href="https://key2nesthomeloans.com" aria-label="Key2Nest Home Loans home">
+      <picture>
+        <source srcset="./assets/Logo_LV-1x.png 1x, ./assets/Logo_LV-2x.png 2x" media="(prefers-color-scheme: light)" />
+        <img src="./assets/Logo_DV-1x.png" srcset="./assets/Logo_DV-1x.png 1x, ./assets/Logo_DV-2x.png 2x" alt="Key2Nest Home Loans" class="index-logo" width="200" height="200" />
+      </picture>
+    </a>
     <h1>Digital Business Cards</h1>
     <p class="index-sub">Tap a name to preview that member's card.</p>
     <ul class="index-list">
