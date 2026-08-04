@@ -41,6 +41,12 @@ ROOT = Path(__file__).resolve().parent
 # The host the printed QR codes point to.
 BASE_URL = "https://key2nesthomeloans.com"
 
+# Path prefix under BASE_URL where the clean card URLs live. The final QR
+# payload is BASE_URL + URL_PREFIX + "/" + slug — e.g.
+#   https://key2nesthomeloans.com/team/vivek
+# Keep in sync with the site-root _redirects rewrite rules.
+URL_PREFIX = "/team"
+
 # Absolute path where the cards folder is served on that host. The pages are
 # deployed under key2nesthomeloans.com/cards/ and a Netlify rewrite maps the
 # clean /<slug> URL onto /cards/<slug>/ (see _redirects in the site root). The
@@ -328,7 +334,7 @@ def main():
 
     index_rows = []
     for p in PEOPLE:
-        card_url = f"{BASE_URL}/{p['slug']}"
+        card_url = f"{BASE_URL}{URL_PREFIX}/{p['slug']}"
 
         # 1) Card page
         page_dir = ROOT / p["slug"]
