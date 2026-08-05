@@ -59,7 +59,7 @@ COMPANY = {
     "name": "Key2Nest Home Loans LLC",
     "nmls": "2819804",
     "nmls_url": "https://www.nmlsconsumeraccess.org/EntityDetails.aspx/COMPANY/2819804",
-    "states": "Licensed in Alabama, Arkansas, Florida & Texas",
+    "states": "Licensed in Arizona, Arkansas, Florida & Texas",
     "apply_url": "https://key2nesthomeloans.com/#contact",
     "site_url": "https://key2nesthomeloans.com",
 }
@@ -120,7 +120,7 @@ PEOPLE = [
         "first": "Venkata Rajaneesh", "last": "Jandhyam",
         "title": "Co-Founder / Sr. Mortgage Loan Originator",
         "nmls": "2142434",
-        "photo": "Rajaneesh_new.jpeg",
+        "photo": "Rajaneesh_new.png",
         "phone": "+15085728811", "phone_display": "+1 (508) 572-8811",
         "email": "rj@key2nesthomeloans.com",
         "whatsapp": "15085728811",
@@ -136,10 +136,13 @@ def build_vcard(p, card_url):
     photo_path = ROOT / "assets" / p["photo"]
     photo_line = ""
     if photo_path.exists():
+        # vCard PHOTO TYPE must match the file — some contact apps reject mismatches.
+        ext = photo_path.suffix.lower()
+        photo_type = "PNG" if ext == ".png" else "JPEG"
         b64 = base64.b64encode(photo_path.read_bytes()).decode("ascii")
         # Fold long base64 per RFC 2426 (75-octet lines, leading space on folds).
         chunks = [b64[i:i + 74] for i in range(0, len(b64), 74)]
-        photo_line = "PHOTO;ENCODING=b;TYPE=JPEG:" + chunks[0]
+        photo_line = f"PHOTO;ENCODING=b;TYPE={photo_type}:" + chunks[0]
         for c in chunks[1:]:
             photo_line += "\r\n " + c
         photo_line += "\r\n"

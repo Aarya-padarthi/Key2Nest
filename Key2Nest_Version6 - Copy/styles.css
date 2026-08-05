@@ -2766,7 +2766,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
   position: sticky;
   top: 0;
   z-index: 30;
-  background: rgba(11, 26, 46, 0.92);
+  background: rgba(var(--navy-rgb), 0.92);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--hairline-soft);
@@ -3895,6 +3895,11 @@ html[data-theme="dark"] .team-modal-nmls  { color: #D4AF37; }
 @media (max-width: 768px) {
   .ehl-mark { height: 132px; margin-top: 20px; }
 }
+/* Theme-aware EHL badge: gold in dark mode, navy in light mode. Two <img>
+   tags live in the DOM and we toggle display — matches the logo pattern. */
+.ehl-mark-light { display: none; }
+html[data-theme="light"] .ehl-mark-dark { display: none; }
+html[data-theme="light"] .ehl-mark-light { display: block; }
 .footer-ehl-sub {
   margin: 8px 0 0;
   font-size: 11.5px;
@@ -3950,3 +3955,4 @@ html[data-theme="dark"] .team-modal-nmls  { color: #D4AF37; }
   color: var(--text-muted);
   max-width: 960px;
 }
+

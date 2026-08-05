@@ -1,0 +1,6 @@
+# Local Claude Code session state — never commit
+.claude/
+
+# OS artifacts
+Thumbs.db
+.DS_Store
